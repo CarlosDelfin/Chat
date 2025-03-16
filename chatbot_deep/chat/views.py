@@ -5,15 +5,13 @@ from django.views.decorators.csrf import csrf_exempt
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 
-DEEPSEEK_API_KEY = "sk-b0f392d19e834bbeb271b3f04e50c1aa"
+DEEPSEEK_API_KEY = "-----"
 
 @csrf_exempt
 
 def chat(request):
     if request.method == 'POST':
         user_message = request.POST.get('message')
-        user_message = 'hola'
-        print('msg: ', user_message)
         try:
             #llamar a la api
             header = {
@@ -28,11 +26,8 @@ def chat(request):
             response = requests.post(DEEPSEEK_API_URL, headers = header, json=data)
             response.raise_for_status()
             
-            if response.status_code == 200:
-                bot_response = response.json()["choices"][0]["message"]["content"]
-                return JsonResponse({'response': bot_response})
-            else: 
-                return JsonResponse({'error': "Error al comunicarse con la API"}, status=response.status_code)
+            bot_response = response.json()["choices"][0]["message"]["content"]
+            return JsonResponse({'response': bot_response})
         
         except requests.exceptions.RequestException as e:
             # Captura errores de la solicitud a la API
