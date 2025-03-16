@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang='es'>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>chatbot test</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+    <body>
+        
+        <div class = 'chat-container'>
+            
+            <h1>Chatbot Escolar</h1>
+            <div id = 'chat-box'></div>
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+                <button id="send-btn">Enviar</button>
+            </div>
+
+        </div>
+        
+        <script>
+
+            document.getElementById("send-btn").addEventListener('Click', async()=>{
+                const userInput = document.getElementById("user-input").value;
+                const chatBox = document.getElementById("chat-box");
+
+                chatBox.innerHTML += `<div class = "user-message">Tú: ${userInput}</div>`;
+
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": "{{ csrf_token }}", //seguridad
+                    },
+                    body: `message = ${encodeURIComponent(userInput)}`,
+
+                });
+
+                const data = await response.json();
+
+                if (data.response){
+                    chatbox.innerHTML += `<div class = 'bot-message'>Bot: ${data.response}</div>`;
+                }else{
+                    chatbox.innerHTML += `<div class = 'error-message'>Bot: ${data.error}</div>`;
+                }
+
+                document.getElementById('user-input').value = '';
+            })
+
+        </script>
+
+
+    </body>
+</html>
