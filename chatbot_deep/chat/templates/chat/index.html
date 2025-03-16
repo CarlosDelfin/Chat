@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang='es'>
     <head>
@@ -9,6 +10,7 @@
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
     <body>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
         
         <div class = 'chat-container'>
             
@@ -23,28 +25,30 @@
         
         <script>
 
-            document.getElementById("send-btn").addEventListener('Click', async()=>{
+            document.getElementById("send-btn").addEventListener('click', async () =>{
                 const userInput = document.getElementById("user-input").value;
                 const chatBox = document.getElementById("chat-box");
 
                 chatBox.innerHTML += `<div class = "user-message">Tú: ${userInput}</div>`;
+                
+                const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
 
                 const response = await fetch('/', {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
-                        "X-CSRFToken": "{{ csrf_token }}", //seguridad
+                        "X-CSRFToken": csrfToken, //seguridad
                     },
-                    body: `message = ${encodeURIComponent(userInput)}`,
+                    body: `message=${encodeURIComponent(userInput)}`,
 
                 });
 
                 const data = await response.json();
 
                 if (data.response){
-                    chatbox.innerHTML += `<div class = 'bot-message'>Bot: ${data.response}</div>`;
+                    chatBox.innerHTML += `<div class = 'bot-message'>Bot: ${data.response}</div>`;
                 }else{
-                    chatbox.innerHTML += `<div class = 'error-message'>Bot: ${data.error}</div>`;
+                    chatBox.innerHTML += `<div class = 'error-message'>Bot: ${data.error}</div>`;
                 }
 
                 document.getElementById('user-input').value = '';
