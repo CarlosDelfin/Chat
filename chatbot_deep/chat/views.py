@@ -9,11 +9,9 @@ DEEPSEEK_API_KEY = "sk-1274d0aeb51d4add90c92e44924b1ed4"
 
 context = ''
 
-with open('context.txt') as file:
+with open('chat\context.txt', mode = 'r') as file:
     for line in file:
         context += line
-
-
 
 @csrf_exempt
 
