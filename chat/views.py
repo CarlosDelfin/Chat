@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 
-DEEPSEEK_API_KEY = "sk-1274d0aeb51d4add90c92e44924b1ed4"
+DEEPSEEK_API_KEY = "sk-d8ac6296a4b14ee2bf0797003160fa09"
 
 context = ''
 
