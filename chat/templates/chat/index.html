@@ -39,7 +39,7 @@
                         "Content-Type": "application/x-www-form-urlencoded",
                         "X-CSRFToken": csrfToken, //seguridad
                     },
-                    body: `message=${encodeURIComponent(userInput)}`,
+                    body: `message=${encodeURIComponent(userInput)}&obj=${encodeURIComponent('speechToTxt')}`,
 
                 });
 
