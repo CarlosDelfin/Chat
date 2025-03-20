@@ -1,13 +1,21 @@
 import requests
+from decouple import config
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 
-DEEPSEEK_API_KEY = "sk-56bd0e88db2144fa87134b02a5250ead"
+Google_API_URL = 'https://speech.googleapis.com/v1p1beta1/speech:recognize'
 
-context = ''
+DEEPSEEK_API_KEY = config('DEEPSEEK_API_KEY')
+
+Google_API_KEY = config('Google_API_KEY')
+
+header = {
+    'Authorization': f'Bearer {DEEPSEEK_API_KEY}',
+    'Content-Type': 'application/json',
+}
 
 with open('chat\context.txt', mode = 'r') as file:
     for line in file:
@@ -21,13 +29,10 @@ def chat(request):
     if request.method == 'POST':
         match request.POST.get('obj'):
             case 'api':
-                user_message = request.POST.get('message')
+                user_message = request.POST.get('content')
                 try:
                     #llamar a la api
-                    header = {
-                        'Authorization': f'Bearer {DEEPSEEK_API_KEY}',
-                        'Content-Type': 'application/json',
-                    }
+                    
                     data = {
                         'model': 'deepseek-chat',
                         'messages': [{'role':'system', 'content': context},
@@ -47,5 +52,8 @@ def chat(request):
                     # Captura errores si la estructura de la respuesta no es la esperada
                     return JsonResponse({"error": f"Error en la respuesta de la API: {str(e)}"}, status=response.status_code)
             case 'speechToTxt':
-                pass    
+                voice = request.POST.get('content')
+                
+                
+                
     return render(request, 'chat/index.html')    
