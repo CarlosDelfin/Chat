@@ -1,61 +1,118 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang='es'>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>chatbot test</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    </head>
-    <body>
-        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-        
-        <div class = 'chat-container'>
-            
-            <h1>Chatbot Escolar</h1>
-            <div id = 'chat-box'></div>
-            <div class="input-container">
-                <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
-                <button id="send-btn">Enviar</button>
-            </div>
-
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Chatbot Escolar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body class="simple-linear">
+    
+    <!-- Banner de imágenes -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
         </div>
-        
-        <script>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="{% static 'images/banner1.jpg' %}" class="d-block w-100" alt="Banner 1">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/banner2.jpg' %}" class="d-block w-100" alt="Banner 2">
+            </div>
+            <div class="carousel-item">
+                <img src="{% static 'images/banner3.jpg' %}" class="d-block w-100" alt="Banner 3">
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
+    </div>
 
-            document.getElementById("send-btn").addEventListener('click', async () =>{
-                const userInput = document.getElementById("user-input").value;
-                const chatBox = document.getElementById("chat-box");
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="chat-container">
+                    <h1>Bienvenido al Chat de la Universidad Politécnica de Bacalar</h1>
+                    <p>Este chat está diseñado para atenderte de primera mano y resolver las dudas que tengas.</p>
+                    
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <div id="chat-box"></div>
+                    
+                    <div class="input-container">
+                        <input type="text" id="user-input" placeholder="Escribe tu mensaje...">
+                        <button id="send-btn">🎙️</button>
+                        <button id="send-btn">🛑</button>
+                        <button id="send-btn">Enviar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                chatBox.innerHTML += `<div class = "user-message">Tú: ${userInput}</div>`;
-                
-                const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const message = userInput.value.trim();
 
-                const response = await fetch('/', {
-                    method: 'POST',
+            if (message === "") return;
+
+            chatBox.innerHTML += `<div class="user-message">Tú: ${message}</div>`;
+            userInput.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+            try {
+                const response = await fetch("/", {
+                    method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
-                        "X-CSRFToken": csrfToken, //seguridad
+                        "X-CSRFToken": csrfToken,
                     },
+<<<<<<< HEAD:chatbot_deep/chat/templates/chat/index.html
+                    body: `message=${encodeURIComponent(message)}`,
+=======
                     body: `content=${encodeURIComponent(userInput)}&obj=${encodeURIComponent('speechToTxt')}`,
 
+>>>>>>> 732fc8c2b571c0311a7254b91aaee1b0c87bec7a:chat/templates/chat/index.html
                 });
 
                 const data = await response.json();
 
-                if (data.response){
-                    chatBox.innerHTML += `<div class = 'bot-message'>Bot: ${data.response}</div>`;
-                }else{
-                    chatBox.innerHTML += `<div class = 'error-message'>Bot: ${data.error}</div>`;
+                if (data.response) {
+                    chatBox.innerHTML += `<div class="bot-message">Bot: ${data.response}</div>`;
+                } else {
+                    chatBox.innerHTML += `<div class="error-message">Bot: ${data.error}</div>`;
                 }
 
-                document.getElementById('user-input').value = '';
-            })
+            } catch (error) {
+                chatBox.innerHTML += `<div class="error-message">Error de conexión.</div>`;
+            }
 
-        </script>
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
+        document.getElementById("send-btn").addEventListener("click", sendMessage);
 
-    </body>
+        document.getElementById("user-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+</body>
 </html>
