@@ -12,15 +12,20 @@ DEEPSEEK_API_KEY = config('DEEPSEEK_API_KEY')
 
 Google_API_KEY = config('Google_API_KEY')
 
+context = ''
+
 header = {
     'Authorization': f'Bearer {DEEPSEEK_API_KEY}',
     'Content-Type': 'application/json',
 }
 
-with open('chat\context.txt', mode = 'r') as file:
+with open('chat/context.txt', mode = 'r') as file:
     for line in file:
         context += line
 
+
+with open('chat/test.ogg', mode = 'rb') as afile:
+    audio = afile.read()
 @csrf_exempt
 
 
@@ -51,8 +56,31 @@ def chat(request):
                 except KeyError as e:
                     # Captura errores si la estructura de la respuesta no es la esperada
                     return JsonResponse({"error": f"Error en la respuesta de la API: {str(e)}"}, status=response.status_code)
+            
             case 'speechToTxt':
                 voice = request.POST.get('content')
+                
+                data = {
+                    'audio': {
+                        'content': audio.hex(),
+                    },
+                    'config':{
+                        "enableAutomaticPunctuation": True,
+                        "encoding": "LINEAR16",
+                        "languageCode": "es-MX",
+                        "model": "default",
+                    }
+                }
+                
+                response = requests.post(Google_API_URL, headers=header, json=data)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    for alternative in result.get("results", [])[0].get("alternatives", []):
+                        return JsonResponse("Texto transcrito: {}".format(alternative["transcript"]))
+                else:
+                    return JsonResponse(f"Error: {response.status_code} - {response.text}")
+                
                 
                 
                 
